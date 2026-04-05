@@ -205,7 +205,7 @@ app.get('/api/data', auth, async (req, res) => {
 
 app.post('/api/data', auth, async (req, res) => {
   sweepLock();
-  if (!lockValid() || lock.username !== req.session.user.username)
+  if (!lockValid() || lock.sessionId !== req.session.id)
     return res.status(423).json({ error: 'Nie masz blokady edycji' });
   lock.expiresAt = Date.now() + LOCK_TTL;
   try { await writeData(req.body); res.json({ ok: true }); }
@@ -220,28 +220,29 @@ app.get('/api/lock', auth, (req, res) => {
   if (!lock) return res.json({ locked: false });
   res.json({
     locked: true, username: lock.username, displayName: lock.displayName,
-    acquiredAt: lock.acquiredAt, isYours: lock.username === req.session.user.username
+    acquiredAt: lock.acquiredAt, isYours: lock.sessionId === req.session.id
   });
 });
 
 app.post('/api/lock/acquire', auth, (req, res) => {
   sweepLock();
-  const u = req.session.user;
-  if (lock && lock.username !== u.username)
+  const u   = req.session.user;
+  const sid = req.session.id;
+  if (lock && lock.sessionId !== sid)
     return res.status(423).json({ error: `Edytuje teraz: ${lock.displayName}`, lockedBy: lock.displayName });
-  lock = { username: u.username, displayName: u.displayName, acquiredAt: Date.now(), expiresAt: Date.now() + LOCK_TTL };
+  lock = { sessionId: sid, username: u.username, displayName: u.displayName, acquiredAt: Date.now(), expiresAt: Date.now() + LOCK_TTL };
   res.json({ ok: true });
 });
 
 app.post('/api/lock/release', auth, (req, res) => {
   sweepLock();
-  if (lock && lock.username === req.session.user.username) lock = null;
+  if (lock && lock.sessionId === req.session.id) lock = null;
   res.json({ ok: true });
 });
 
 app.post('/api/lock/force', auth, (req, res) => {
   const u = req.session.user;
-  lock = { username: u.username, displayName: u.displayName, acquiredAt: Date.now(), expiresAt: Date.now() + LOCK_TTL };
+  lock = { sessionId: req.session.id, username: u.username, displayName: u.displayName, acquiredAt: Date.now(), expiresAt: Date.now() + LOCK_TTL };
   res.json({ ok: true });
 });
 

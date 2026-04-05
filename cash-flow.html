@@ -630,7 +630,7 @@ async function afterLogin() {
   initBalance(); renderIncs(); renderVars(); renderFixs(); renderCal(); renderCF(); initNav();
   applyReadOnly();
   await pollLock();
-  lockPollTimer = setInterval(pollLock, 15000);
+  lockPollTimer = setInterval(pollLock, 5000);
 }
 
 // ═══════════════════════════════════════════
