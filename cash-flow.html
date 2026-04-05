@@ -296,8 +296,23 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .empty{text-align:center;padding:30px;color:var(--muted);font-size:13px;letter-spacing:.5px}
 
 @media(max-width:800px){
-  .row3{grid-template-columns:1fr 150px 38px}
-  .row3>*:nth-child(3){display:none}
+  /* Nagłówek tabeli: ukryj kolumnę "Data" — jest widoczna w wierszu */
+  .tbl-header.row3{grid-template-columns:1fr 140px 38px}
+  .tbl-header.row3>*:nth-child(3){display:none}
+
+  /* Wiersze danych: layout piętrowy — data pod kwotą */
+  .exp-row.row3{
+    grid-template-columns:1fr 38px;
+    grid-template-areas:
+      "name del"
+      "amt  amt"
+      "date date";
+  }
+  .exp-row.row3>*:nth-child(1){grid-area:name}
+  .exp-row.row3>*:nth-child(2){grid-area:amt}
+  .exp-row.row3>*:nth-child(3){grid-area:date}
+  .exp-row.row3>*:nth-child(4){grid-area:del}
+
   .cf-header,.cf-row{grid-template-columns:1fr 1fr}
   .app-header::before{width:100px}
   .brand-name,.header-divider{display:none}
