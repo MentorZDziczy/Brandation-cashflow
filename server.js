@@ -162,6 +162,14 @@ async function deleteUser(username) {
 // ══════════════════════════════════════════════════════════════════════════
 app.use(express.json());
 app.use(express.static(__dirname));
+
+// Diagnostyka — tymczasowy endpoint
+app.get('/api/debug-mode', (req, res) => {
+  res.json({
+    mode: db._mode || 'postgresql',
+    hasDatabaseUrl: !!process.env.DATABASE_URL
+  });
+});
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'cash-flow.html')));
 
 function auth(req, res, next) {
